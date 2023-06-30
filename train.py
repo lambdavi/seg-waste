@@ -75,8 +75,8 @@ def main():
 def train(train_loader, net, criterion, optimizer, epoch):
     for inputs, labels in tqdm(train_loader, ascii=True):
         #inputs, labels = data
-        inputs = inputs.cuda()
-        labels = labels.cuda()
+        inputs = Variable(inputs).cuda()
+        labels = Variable(labels).cuda()
         optimizer.zero_grad()
         outputs = net(inputs)
         loss = criterion(outputs, labels.unsqueeze(1).float())
