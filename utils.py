@@ -73,6 +73,8 @@ def scores(label_trues, label_preds, n_class):
       - mean IU
       - fwavacc
     """
+    label_trues = label_trues.numpy()
+    label_preds = label_preds.numpy()
     hist = np.zeros((n_class, n_class))
     for lt, lp in zip(label_trues, label_preds):
         hist += _fast_hist(lt.flatten(), lp.flatten(), n_class)
