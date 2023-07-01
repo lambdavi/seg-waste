@@ -14,8 +14,9 @@ from tensorboardX import SummaryWriter
 from model import ENet
 from config import cfg
 from loading_data import loading_data
-from utils import *
+from utils.utils import *
 from timer import Timer
+from utils.stream_metrics import StreamSegMetrics
 import pdb
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -26,6 +27,7 @@ writer = SummaryWriter(cfg.TRAIN.EXP_PATH+ '/' + exp_name)
 
 pil_to_tensor = standard_transforms.ToTensor()
 train_loader, val_loader, restore_transform = loading_data()
+metric = StreamSegMetrics(1, "val")
 
 def main():
 
@@ -83,8 +85,23 @@ def train(train_loader, net, criterion, optimizer, epoch):
         loss = criterion(outputs, labels.unsqueeze(1).float())
         loss.backward()
         optimizer.step()
+        #print(scores(labels, outputs, 1))
 
 
+def update_metric(outputs, labels):
+        """
+        Update the evaluation metric with the model outputs and labels.
+
+        Args:
+            `metric`: Metric object to be updated.\n
+            `outputs`: Model outputs.\n
+            `labels`: True labels.
+
+        """
+        _, prediction = outputs.max(dim=1)
+        labels = labels.cpu().numpy()
+        prediction = prediction.cpu().numpy()
+        metric.update(labels, prediction)
 
 def validate(val_loader, net, criterion, optimizer, epoch, restore):
     net.eval()
@@ -93,6 +110,7 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore):
     output_batches = []
     label_batches = []
     iou_ = 0.0
+    metric.reset()
     with torch.no_grad():
         for vi, data in enumerate(val_loader, 0):
             inputs, labels = data
@@ -104,12 +122,13 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore):
             outputs[outputs<=0.5] = 0
             #print(outputs)
             #print(labels)
-        print(scores(labels, outputs, 1))
-
+            update_metric(outputs, labels)
+        
         iou_ += calculate_mean_iu([outputs.squeeze_(1).data.cpu().numpy()], [labels.data.cpu().numpy()], 2)
     mean_iu = iou_/len(val_loader)   
 
     print('[mean iu %.4f]' % (mean_iu)) 
+    print(metric.get_results())
     net.train()
     criterion.cuda()
 
