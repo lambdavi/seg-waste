@@ -27,7 +27,8 @@ writer = SummaryWriter(cfg.TRAIN.EXP_PATH+ '/' + exp_name)
 
 pil_to_tensor = standard_transforms.ToTensor()
 train_loader, val_loader, restore_transform = loading_data()
-metric = StreamSegMetrics(1, "val")
+train_metric = StreamSegMetrics(1, "train")
+val_metric = StreamSegMetrics(1, "val")
 
 def main():
 
@@ -64,7 +65,9 @@ def main():
     scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
     _t = {'train time' : Timer(),'val time' : Timer()} 
     validate(val_loader, net, criterion, optimizer, -1, restore_transform)
+    print("Starting training..")
     for epoch in range(cfg.TRAIN.MAX_EPOCH):
+        print(f"Epoch {epoch}/{cfg.TRAIN.MAX_EPOCH}")
         _t['train time'].tic()
         train(train_loader, net, criterion, optimizer, epoch)
         _t['train time'].toc(average=False)
@@ -76,6 +79,7 @@ def main():
 
 
 def train(train_loader, net, criterion, optimizer, epoch):
+    train_metric.reset()
     for inputs, labels in tqdm(train_loader, ascii=True):
         #inputs, labels = data
         inputs = Variable(inputs).cuda()
@@ -86,9 +90,11 @@ def train(train_loader, net, criterion, optimizer, epoch):
         loss.backward()
         optimizer.step()
         #print(scores(labels, outputs, 1))
+        update_metric(train_metric, outputs, labels)
+    print(train_metric.get_results())
 
 
-def update_metric(outputs, labels):
+def update_metric(metric, outputs, labels):
         """
         Update the evaluation metric with the model outputs and labels.
 
@@ -110,7 +116,7 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore):
     output_batches = []
     label_batches = []
     iou_ = 0.0
-    metric.reset()
+    val_metric.reset()
     with torch.no_grad():
         for vi, data in enumerate(val_loader, 0):
             inputs, labels = data
@@ -122,13 +128,13 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore):
             outputs[outputs<=0.5] = 0
             #print(outputs)
             #print(labels)
-            update_metric(outputs, labels)
+            update_metric(val_metric, outputs, labels)
         
         iou_ += calculate_mean_iu([outputs.squeeze_(1).data.cpu().numpy()], [labels.data.cpu().numpy()], 2)
     mean_iu = iou_/len(val_loader)   
 
     print('[mean iu %.4f]' % (mean_iu)) 
-    print(metric.get_results())
+    print(val_metric.get_results())
     net.train()
     criterion.cuda()
 
