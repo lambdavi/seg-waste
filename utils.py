@@ -59,6 +59,8 @@ def colorize_mask(mask):
 
 
 def _fast_hist(label_true, label_pred, n_class):
+    label_true = label_true.cpu().numpy().astype(int)
+    label_pred = label_pred.cpu().numpy().astype(int)
     mask = (label_true >= 0) & (label_true < n_class)
     hist = np.bincount(
         n_class * label_true[mask].astype(int) +

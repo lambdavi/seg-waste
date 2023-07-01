@@ -18,6 +18,7 @@ from utils import *
 from timer import Timer
 import pdb
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 exp_name = cfg.TRAIN.EXP_NAME
 log_txt = cfg.TRAIN.EXP_LOG_PATH + '/' + exp_name + '.txt'
@@ -84,6 +85,7 @@ def train(train_loader, net, criterion, optimizer, epoch):
         optimizer.step()
 
 
+
 def validate(val_loader, net, criterion, optimizer, epoch, restore):
     net.eval()
     criterion.cpu()
@@ -100,10 +102,9 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore):
             #for binary classification
             outputs[outputs>0.5] = 1
             outputs[outputs<=0.5] = 0
-            print(outputs)
-            print(labels)
-
-            print(scores(labels, outputs,1))
+            #print(outputs)
+            #print(labels)
+        print(scores(labels, outputs, 1))
 
         iou_ += calculate_mean_iu([outputs.squeeze_(1).data.cpu().numpy()], [labels.data.cpu().numpy()], 2)
     mean_iu = iou_/len(val_loader)   
