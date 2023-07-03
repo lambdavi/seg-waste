@@ -128,7 +128,7 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore):
             outputs[outputs<=0.5] = 0
             #print(outputs)
             #print(labels)
-            val_metric.update(labels, outputs)
+            val_metric.update(labels.cpu().numpy(), outputs.cpu().numpy())
         
         iou_ += calculate_mean_iu([outputs.squeeze_(1).data.cpu().numpy()], [labels.data.cpu().numpy()], 2)
     mean_iu = iou_/len(val_loader)   
