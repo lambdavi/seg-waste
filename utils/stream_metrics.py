@@ -140,6 +140,9 @@ class StreamSegMetrics(Metrics):
             ndarray: Histogram of true and predicted labels.
         """
         mask = (label_true >= 0) & (label_true < self.n_classes)
+        label_true = label_true.astype(int)
+        label_pred = label_pred.astype(int)
+
         hist = np.bincount(
             self.n_classes * label_true[mask].astype(int) + label_pred[mask],
             minlength=self.n_classes ** 2,
