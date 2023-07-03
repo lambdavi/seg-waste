@@ -20,6 +20,8 @@ from utils.stream_metrics import StreamSegMetrics
 import pdb
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+from utils.args import get_parser
+
 
 exp_name = cfg.TRAIN.EXP_NAME
 log_txt = cfg.TRAIN.EXP_LOG_PATH + '/' + exp_name + '.txt'
@@ -30,8 +32,11 @@ train_loader, val_loader, restore_transform = loading_data()
 train_metric = StreamSegMetrics(2, "train")
 val_metric = StreamSegMetrics(2, "val")
 
-# TODO Insert args
 def main():
+    # TODO Modify args and create a skeleton OOP
+
+    parser = get_parser()
+    args = parser.parse_args()
 
     cfg_file = open('./config.py',"r")  
     cfg_lines = cfg_file.readlines()
