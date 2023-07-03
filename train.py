@@ -106,6 +106,8 @@ def update_metric(metric, outputs, labels):
         """
         _, prediction = outputs.max(dim=1)
         labels = labels.cpu().numpy()
+        labels[labels>0] = 1
+        prediction[prediction>0] = 1
         prediction = prediction.cpu().numpy()
         metric.update(labels, prediction)
 
