@@ -90,7 +90,7 @@ def train(train_loader, net, criterion, optimizer, epoch):
         loss.backward()
         optimizer.step()
         #print(scores(labels, outputs, 1))
-        out_metr = outputs
+        out_metr = outputs.detach()
         out_metr[out_metr > 0.5] = 1
         out_metr[out_metr<=0.5] = 0
         train_metric.update(labels.cpu().numpy(), out_metr.cpu().numpy())
