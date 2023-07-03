@@ -27,8 +27,8 @@ writer = SummaryWriter(cfg.TRAIN.EXP_PATH+ '/' + exp_name)
 
 pil_to_tensor = standard_transforms.ToTensor()
 train_loader, val_loader, restore_transform = loading_data()
-train_metric = StreamSegMetrics(1, "train")
-val_metric = StreamSegMetrics(1, "val")
+train_metric = StreamSegMetrics(2, "train")
+val_metric = StreamSegMetrics(2, "val")
 
 # TODO Insert args
 def main():
