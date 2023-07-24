@@ -35,8 +35,8 @@ val_metric = StreamSegMetrics(2, "val")
 def main():
     # TODO Modify args and create a skeleton OOP
 
-    parser = get_parser()
-    args = parser.parse_args()
+    #parser = get_parser()
+    #args = parser.parse_args()
 
     cfg_file = open('./config.py',"r")  
     cfg_lines = cfg_file.readlines()
