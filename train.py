@@ -243,20 +243,19 @@ def predict(image_path, train_loader, model, device):
 
     output = output.squeeze(0).cpu().numpy()
 
-    normalized_output = (output - output.min()) / (output.max() - output.min())
+    #normalized_output = (output - output.min()) / (output.max() - output.min())
 
-    predicted_labels = np.argmax(normalized_output, axis=0)
+    predicted_labels = np.argmax(output, axis=0)
     print(np.unique(predicted_labels))
 
+    class_names = ["alluminum", "carton", "bottle", "nylon", "background"]
+
     # Get colormap
-    colormap = plt.cm.get_cmap('tab20', predicted_labels.max() + 1)
+    colormap = plt.cm.get_cmap('tab20', len(class_names))
+    print(colormap)
 
     # Create the predicted image with colors
-    predicted_image = Image.fromarray((colormap(predicted_labels) * 255).astype(np.uint8))
-    
-    # Save the predicted image
-    
-    class_names = ["background", "alluminum", "carton", "bottle", "nylon"]
+    predicted_image = Image.fromarray((colormap(predicted_labels) *255 ).astype(np.uint8))    
     
     # Create a legend
     legend_elements = [plt.Rectangle((0, 0), 1, 1, color=colormap(i)) for i in range(len(class_names))]
