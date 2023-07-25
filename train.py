@@ -146,7 +146,8 @@ def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu
         else:
             update_metric(train_metric, outputs, labels)
             #train_metric.update(labels.cpu().numpy(), outputs.detach().cpu().numpy())
-
+    
+    # TODO: Better results visualization
     print(train_metric.get_results())
 
 
