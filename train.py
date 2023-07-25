@@ -100,15 +100,15 @@ def main():
         for epoch in range(cfg.TRAIN.MAX_EPOCH):
             print(f"### \tEpoch {epoch+1}/{cfg.TRAIN.MAX_EPOCH}\t ###")
             _t['train time'].tic()
-            print("\t### TRAINING ###")
+            print(" --- TRAINING --- ")
             train(train_loader, net, criterion, reduction, optimizer, epoch, device)
             _t['train time'].toc(average=False)
-            print('training time of one epoch: {:.2f}s'.format(_t['train time'].diff))
+            #print('training time of one epoch: {:.2f}s'.format(_t['train time'].diff))
             _t['val time'].tic()
-            print("\t### VALIDATION ###")
+            print(" --- VALIDATION --- ")
             validate(val_loader, net, criterion, optimizer, epoch, restore_transform, device)
             _t['val time'].toc(average=False)
-            print('val time of one epoch: {:.2f}s'.format(_t['val time'].diff))
+            #print('val time of one epoch: {:.2f}s'.format(_t['val time'].diff))
     
     if cfg.PRED_PATH:
         predict(cfg.PRED_PATH, train_loader, net, device)

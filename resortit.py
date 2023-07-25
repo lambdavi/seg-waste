@@ -31,6 +31,7 @@ def make_dataset(mode):
             images.append(item)
     return images
 
+translator = {0: 255, 1:0, 2:1, 3:2, 4:3}
 
 class resortit(data.Dataset):
     def __init__(self, mode, simul_transform=None, transform=None, target_transform=None):
@@ -49,7 +50,7 @@ class resortit(data.Dataset):
         if cfg.TASK == "binary":
             mask[mask>0] = 1   ##########Only Binary Segmentation#####
         else:
-            mask[mask==0] = 255
+            np.vectorize(translator.get)(mask)
         mask = Image.fromarray(mask)
         if self.simul_transform is not None:
             img, mask = self.simul_transform(img, mask)
