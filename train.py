@@ -79,7 +79,7 @@ def main():
     if cfg.TASK == "binary":
         criterion = torch.nn.BCEWithLogitsLoss().to(device)# Binary Classification
     else:
-        criterion = torch.nn.CrossEntropyLoss(ignore_index=cfg.IGNORE_LABEL)
+        criterion = torch.nn.CrossEntropyLoss(ignore_index=cfg.DATA.IGNORE_LABEL)
 
     optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
     scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
@@ -98,7 +98,7 @@ def main():
         _t['val time'].toc(average=False)
         print('val time of one epoch: {:.2f}s'.format(_t['val time'].diff))
     
-    print(torchsummary.summary(net, 1, cfg.IMAGE_SIZE))
+    #print(torchsummary.summary(net, 1, cfg.IMAGE_SIZE))
 
 def train(train_loader, net, criterion, optimizer, epoch, device="cpu"):
     train_metric.reset()
