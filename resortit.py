@@ -46,7 +46,8 @@ class resortit(data.Dataset):
         img_path, mask_path = self.imgs[index]
         img = self.loader(img_path)
         mask = np.array(self.loader(mask_path))
-        mask[mask>0] = 1   ##########Only Binary Segmentation#####
+        if cfg.TASK == "binary":
+            mask[mask>0] = 1   ##########Only Binary Segmentation#####
         mask = Image.fromarray(mask)
         if self.simul_transform is not None:
             img, mask = self.simul_transform(img, mask)
