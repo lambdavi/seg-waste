@@ -123,6 +123,7 @@ def update_metric(metric, outputs, labels):
 
 def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu"):
     train_metric.reset()
+    torch.cuda.empty_cache()
     for inputs, labels in tqdm(train_loader, ascii=True):
         #inputs, labels = data
         inputs = Variable(inputs).to(device, dtype=torch.float32)
