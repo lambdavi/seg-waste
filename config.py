@@ -28,7 +28,7 @@ __C.PRED_PATH = args.pred_path
 
 __C.DATA.DATASET = 'city' # dataset
 __C.DATA.DATA_PATH = 'dataset/'
-__C.DATA.NUM_CLASSES = 4
+__C.DATA.NUM_CLASSES = 5
 __C.DATA.IGNORE_LABEL = 255
 __C.DATA.IGNORE_LABEL_TO_TRAIN_ID = 19 # 255->19
 __C.DATA.NUM_WORKERS = 2                                    

@@ -42,7 +42,7 @@ class resortit(data.Dataset):
         self.loader = default_loader
         self.simul_transform = simul_transform
         self.transform = transform
-        self.mapping = self.get_mapping()
+        #self.mapping = self.get_mapping()
         self.target_transform = target_transform
 
 
