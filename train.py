@@ -91,10 +91,11 @@ def main():
         net.load_state_dict(torch.load("models/saved_models/best_model.pth"))
     else:
         _t = {'train time' : Timer(),'val time' : Timer()} 
-        validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
         optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
         reduction  = MeanReduction()
         scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
+        validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
+    
         print("Starting training..")
         for epoch in range(cfg.TRAIN.MAX_EPOCH):
             print(f"### \tEpoch {epoch+1}/{cfg.TRAIN.MAX_EPOCH}\t ###")
