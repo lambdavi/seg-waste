@@ -135,7 +135,9 @@ def update_metric(metric, outputs, labels):
 
 def print_results(metric):
         results = metric.get_results()
-        print(f"\tMean IOU: {results['Mean IoU']}, Class IOU: {results['Class IoU']}, Class Precision: {results['Class Prec']}")
+        print(f"\tMean IOU: {results['Mean IoU']}")
+        print(f"\tClass IOU: {results['Class IoU']}")
+        print(f"\tClass Precision: {results['Class Prec']}")
 
 
 def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu"):
