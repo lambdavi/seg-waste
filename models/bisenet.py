@@ -80,10 +80,10 @@ class BiSeNet(nn.Module):
         global_context = F.interpolate(global_context,
                                        size=context_blocks[0].size()[2:],
                                        mode='bilinear', align_corners=True)
-
+        # maybe return global_context
         last_fm = global_context
         pred_out = []
-
+        
         for i, (fm, arm, refine) in enumerate(zip(context_blocks[:2], self.arms,
                                                   self.refines)):
             fm = arm(fm)
@@ -93,11 +93,9 @@ class BiSeNet(nn.Module):
             last_fm = refine(last_fm)
             pred_out.append(last_fm)
         context_out = last_fm
-
         concate_fm = self.ffm(spatial_out, context_out)
         # concate_fm = self.heads[-1](concate_fm)
         pred_out.append(concate_fm)
-
         if self.is_training:
             aux_loss0 = self.ohem_criterion(self.heads[0](pred_out[0]), label)
             aux_loss1 = self.ohem_criterion(self.heads[1](pred_out[1]), label)

@@ -10,7 +10,7 @@ def str2tuple(tp=int):
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--seed', type=int, default=0, help='random seed')
-    parser.add_argument('--model', type=str, choices=['enet', 'bisenet', 'bisenetv2'], default='enet', help='model name')
+    parser.add_argument('--model', type=str, choices=['enet', 'bisenet', 'bisenetv2'], default='bisenet', help='model name')
     parser.add_argument('--lr', type=float, default=5e-4, help='learning rate')
     parser.add_argument('--n_epochs', type=int, default=10, help='number of epochs')
     parser.add_argument('--bs', type=int, default=8, help='batch size')

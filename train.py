@@ -133,6 +133,8 @@ def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu
             outputs = net(inputs)
         elif cfg.MODEL == "bisenetv2":
             outputs = net(inputs, test=False)[0]
+        else:
+            outputs = net(inputs)
 
         if cfg.TASK == "binary":
             loss = criterion(outputs, labels.unsqueeze(1).float())
@@ -171,8 +173,10 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
             labels = Variable(labels).to(device)
             if cfg.MODEL == "enet":
                 outputs = net(inputs)
+            elif cfg.MODEL == "bisenetv2":
+                outputs = net(inputs, test=False)[0]
             else:
-                outputs = net(inputs, test=True)
+                outputs = net(inputs)
 
             if cfg.TASK == "binary":
                 #for binary classification
