@@ -171,7 +171,7 @@ def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu
             update_metric(train_metric, outputs, labels)
             #train_metric.update(labels.cpu().numpy(), outputs.detach().cpu().numpy())
     
-        print_results(train.metric)
+        print_results(train_metric)
 
 def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     net.eval()
@@ -209,7 +209,7 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     #mean_iu = iou_/len(val_loader)   
 
     #print('\t[mean iu %.4f]' % (mean_iu)) 
-    print_results(train.metric)
+    print_results(val_metric)
 
     net.train()
 
