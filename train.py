@@ -37,8 +37,8 @@ if cfg.TASK == 'binary':
     train_metric = StreamSegMetrics(2, "train")
     val_metric = StreamSegMetrics(2, "val")
 else:
-    train_metric = StreamSegMetrics(4, "train")
-    val_metric = StreamSegMetrics(4, "val")
+    train_metric = StreamSegMetrics(5, "train")
+    val_metric = StreamSegMetrics(5, "val")
 
 def main():
     # TODO Create a skeleton OOP

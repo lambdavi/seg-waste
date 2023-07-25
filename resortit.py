@@ -32,7 +32,7 @@ def make_dataset(mode):
             images.append(item)
     return images
 
-translator = {0: 255, 1:0, 2:1, 3:2, 4:3}
+#translator = {0: 255, 1:0, 2:1, 3:2, 4:3}
 
 class resortit(data.Dataset):
     def __init__(self, mode, simul_transform=None, transform=None, target_transform=None):
@@ -46,18 +46,12 @@ class resortit(data.Dataset):
         self.target_transform = target_transform
 
 
-    @staticmethod
-    def get_mapping():
-        """
-        Generates a mapping function for target labels.
-
-        Returns:
-            The mapping function.
-        """
+    """ @staticmethod
+    def get_mapping():s
         mapping = np.zeros((256,), dtype=np.int64) + 255
         for gta_idx, data_idx in translator.items():
             mapping[gta_idx] = data_idx
-        return lambda x: from_numpy(mapping[x])
+        return lambda x: from_numpy(mapping[x])"""
     
     def __getitem__(self, index):
         img_path, mask_path = self.imgs[index]
@@ -65,14 +59,16 @@ class resortit(data.Dataset):
         mask = np.array(self.loader(mask_path))
         if cfg.TASK == "binary":
             mask[mask>0] = 1   ##########Only Binary Segmentation#####
-
+        else:
+            mask[mask==0] = 255
+        
         mask = Image.fromarray(mask)
         if self.simul_transform is not None:
             img, mask = self.simul_transform(img, mask)
         if self.transform is not None:
             img = self.transform(img)
         if self.target_transform is not None:
-            mask = self.target_transform(self.mapping(mask))
+            mask = self.target_transform(mask)
 
         return img, mask
 
