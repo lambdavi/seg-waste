@@ -22,7 +22,6 @@ from utils.stream_metrics import StreamSegMetrics
 import pdb
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from utils.args import get_parser
 
 
 exp_name = cfg.TRAIN.EXP_NAME
@@ -31,8 +30,12 @@ writer = SummaryWriter(cfg.TRAIN.EXP_PATH+ '/' + exp_name)
 
 pil_to_tensor = standard_transforms.ToTensor()
 train_loader, val_loader, restore_transform = loading_data()
-train_metric = StreamSegMetrics(2, "train")
-val_metric = StreamSegMetrics(2, "val")
+if cfg.TASK == 'binary':
+    train_metric = StreamSegMetrics(2, "train")
+    val_metric = StreamSegMetrics(2, "val")
+else:
+    train_metric = StreamSegMetrics(4, "train")
+    val_metric = StreamSegMetrics(4, "val")
 
 def main():
     # TODO Create a skeleton OOP
@@ -72,9 +75,14 @@ def main():
     net=net.to(device)
 
     net.train()
-    criterion = torch.nn.BCEWithLogitsLoss().to(device)# Binary Classification
+    if cfg.TASK == "binary":
+        criterion = torch.nn.BCEWithLogitsLoss().to(device)# Binary Classification
+    else:
+        criterion = torch.nn.CrossEntropyLoss(ignore_index=cfg.IGNORE_LABEL)
+
     optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
     scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
+
     _t = {'train time' : Timer(),'val time' : Timer()} 
     validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
     print("Starting training..")
@@ -96,7 +104,6 @@ def train(train_loader, net, criterion, optimizer, epoch, device="cpu"):
         #inputs, labels = data
         inputs = Variable(inputs).to(device)
         labels = Variable(labels).to(device)
-        optimizer.zero_grad()
 
         if cfg.MODEL == "enet":
             outputs = net(inputs)
@@ -104,31 +111,21 @@ def train(train_loader, net, criterion, optimizer, epoch, device="cpu"):
             outputs = net(inputs, test=False)[0]
 
         loss = criterion(outputs, labels.unsqueeze(1).float())
+
+        optimizer.zero_grad()   
         loss.backward()
         optimizer.step()
-        #print(scores(labels, outputs, 1))
-        out_metr = outputs.detach()
-        out_metr[out_metr > 0.5] = 1
-        out_metr[out_metr<=0.5] = 0
-        train_metric.update(labels.cpu().numpy(), out_metr.cpu().numpy())
+
+        if cfg.TASK == "binary":
+            out_metr = outputs.detach()
+            out_metr[out_metr > 0.5] = 1
+            out_metr[out_metr<=0.5] = 0    
+            train_metric.update(labels.cpu().numpy(), out_metr.cpu().numpy())
+        else:
+            train_metric.update(labels.cpu().numpy(), outputs.cpu().numpy())
+
     print(train_metric.get_results())
 
-
-def update_metric(metric, outputs, labels):
-        """
-        Update the evaluation metric with the model outputs and labels.
-
-        Args:
-            `metric`: Metric object to be updated.\n
-            `outputs`: Model outputs.\n
-            `labels`: True labels.
-
-        """
-        _, prediction = outputs.max(dim=1)
-        labels = labels.cpu().numpy()
-        prediction[prediction>0.5] = 1
-        prediction[prediction<=0.5] = 0
-        prediction = prediction.cpu().numpy()
 
 def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     net.eval()

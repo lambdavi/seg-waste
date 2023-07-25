@@ -19,6 +19,7 @@ __C.VAL = edict()
 __C.TEST = edict()
 __C.VIS = edict()
 __C.MODEL = args.model
+__C.TASK = "binary"
 
 #------------------------------DATA------------------------
 
