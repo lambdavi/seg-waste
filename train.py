@@ -88,7 +88,7 @@ def main():
         except:
             print("Error in loading the model")
             exit()"""
-        net.load_state_dict(torch.load("models/saved_models/best_model.pth"))
+        net = torch.load("models/saved_models/best_model.pth")
     else:
         _t = {'train time' : Timer(),'val time' : Timer()} 
         validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
