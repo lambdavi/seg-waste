@@ -176,10 +176,10 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
                 update_metric(val_metric, outputs, labels)
 
         
-        if cfg.TASK == "binary":
+        """if cfg.TASK == "binary":
             iou_ += calculate_mean_iu([outputs.squeeze_(1).data.cpu().numpy()], [labels.data.cpu().numpy()], 2)
         else:
-            iou_ += calculate_mean_iu([outputs.squeeze_(1).data.cpu().numpy()], [labels.data.cpu().numpy()], 4)
+            iou_ += calculate_mean_iu([outputs.squeeze_(1).data.cpu().numpy()], [labels.data.cpu().numpy()], 4)"""
 
     mean_iu = iou_/len(val_loader)   
 
