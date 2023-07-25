@@ -246,7 +246,8 @@ def predict(image_path, train_loader, model, device):
     normalized_output = (output - output.min()) / (output.max() - output.min())
 
     predicted_labels = np.argmax(normalized_output, axis=0)
-
+    print(np.unique(predicted_labels))
+    
     # Get colormap
     colormap = plt.cm.get_cmap('tab20', predicted_labels.max() + 1)
 
