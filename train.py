@@ -86,6 +86,7 @@ def main():
     optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
     reduction  = MeanReduction()
     scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
+    print(summary(net, (3, 224, 448)))
 
     _t = {'train time' : Timer(),'val time' : Timer()} 
     validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
@@ -104,7 +105,6 @@ def main():
     if cfg.SAVE:
         torch.save(net.state_dict(), "models/saved_models/best_model.pth")
 
-    print(summary(net, (3, 224, 448)))
     if cfg.PRED_PATH:
         predict(cfg.PRED_PATH, train_loader, net, device)
     
