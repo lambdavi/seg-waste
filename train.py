@@ -100,11 +100,13 @@ def main():
         _t['val time'].toc(average=False)
         print('val time of one epoch: {:.2f}s'.format(_t['val time'].diff))
     
-    if cfg.SAVE:
-        torch.save(net.state_dict(), "models/saved_models/best_model.pth")
-
     if cfg.PRED_PATH:
         predict(cfg.PRED_PATH, train_loader, net, device)
+        
+    if cfg.SAVE:
+        torch.save(net, "models/saved_models/best_model.pth")
+
+    
     
 def update_metric(metric, outputs, labels):
         """
@@ -216,10 +218,12 @@ def predict(image_path, train_loader, model, device):
     model.eval()
     # Perform inference
     with torch.no_grad():
-        if cfg.model == "enet":
+        if cfg.MODEL == "enet":
             output = model(input_tensor)  # Get the output logits
-        else: 
-            output = model(input_tensor, test=True)  # Get the output logits
+        elif cfg.MODEL == "bisenetv2":
+            output = model(input_tensor, test=False)[0]
+        else:
+            output = model(input_tensor)
 
     output = output.squeeze(0).cpu().numpy()
 
