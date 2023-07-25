@@ -101,7 +101,11 @@ def main():
         _t['val time'].toc(average=False)
         print('val time of one epoch: {:.2f}s'.format(_t['val time'].diff))
     
-    #print(torchsummary.summary(net, 1, cfg.IMAGE_SIZE))
+    if cfg.SAVE:
+        torch.save(net.state_dict(), "models/saved_models/best_model.pth")
+
+    print(torchsummary(net, (1, 224, 448)))
+    
 def update_metric(metric, outputs, labels):
         """
         Update the evaluation metric with the model outputs and labels.

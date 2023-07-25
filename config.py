@@ -20,6 +20,7 @@ __C.TEST = edict()
 __C.VIS = edict()
 __C.MODEL = args.model
 __C.TASK = "multi"
+__C.SAVE = args.save
 
 #------------------------------DATA------------------------
 
