@@ -104,7 +104,7 @@ def main():
     if cfg.SAVE:
         torch.save(net.state_dict(), "models/saved_models/best_model.pth")
 
-    print(summary(net, (1, 1, 224, 448)))
+    print(summary(net, (3, 224, 448)))
     if cfg.PRED_PATH:
         predict(cfg.PRED_PATH, train_loader, net, device)
     
