@@ -42,7 +42,6 @@ else:
 
 def main():
     # TODO Create a skeleton OOP
-
     cfg_file = open('./config.py',"r")  
     cfg_lines = cfg_file.readlines()
     
@@ -81,31 +80,33 @@ def main():
         net = BiSeNet(cfg.DATA.NUM_CLASSES, None, None, None) # get Bisenetv1
 
     net=net.to(device)
-    optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
-    reduction  = MeanReduction()
-    scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
-    #print(net)
-
     _t = {'train time' : Timer(),'val time' : Timer()} 
     validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
-    print("Starting training..")
-    for epoch in range(cfg.TRAIN.MAX_EPOCH):
-        print(f"### \tEpoch {epoch+1}/{cfg.TRAIN.MAX_EPOCH}\t ###")
-        _t['train time'].tic()
-        print("\t### TRAINING ###")
-        train(train_loader, net, criterion, reduction, optimizer, epoch, device)
-        _t['train time'].toc(average=False)
-        print('training time of one epoch: {:.2f}s'.format(_t['train time'].diff))
-        _t['val time'].tic()
-        print("\t### VALIDATION ###")
-        validate(val_loader, net, criterion, optimizer, epoch, restore_transform, device)
-        _t['val time'].toc(average=False)
-        print('val time of one epoch: {:.2f}s'.format(_t['val time'].diff))
+    if cfg.LOAD:
+        net.load_state_dict(torch.load("models/saved_models/best_model.pth"))
+        
+    else:
+        optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
+        reduction  = MeanReduction()
+        scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
+        print("Starting training..")
+        for epoch in range(cfg.TRAIN.MAX_EPOCH):
+            print(f"### \tEpoch {epoch+1}/{cfg.TRAIN.MAX_EPOCH}\t ###")
+            _t['train time'].tic()
+            print("\t### TRAINING ###")
+            train(train_loader, net, criterion, reduction, optimizer, epoch, device)
+            _t['train time'].toc(average=False)
+            print('training time of one epoch: {:.2f}s'.format(_t['train time'].diff))
+            _t['val time'].tic()
+            print("\t### VALIDATION ###")
+            validate(val_loader, net, criterion, optimizer, epoch, restore_transform, device)
+            _t['val time'].toc(average=False)
+            print('val time of one epoch: {:.2f}s'.format(_t['val time'].diff))
     
     if cfg.PRED_PATH:
         predict(cfg.PRED_PATH, train_loader, net, device)
         
-    if cfg.SAVE:
+    if cfg.SAVE and not cfg.LOAD:
         torch.save(net, "models/saved_models/best_model.pth")
 
     
