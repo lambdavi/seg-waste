@@ -247,7 +247,7 @@ def predict(image_path, train_loader, model, device):
 
     predicted_labels = np.argmax(normalized_output, axis=0)
     print(np.unique(predicted_labels))
-    
+
     # Get colormap
     colormap = plt.cm.get_cmap('tab20', predicted_labels.max() + 1)
 
@@ -256,7 +256,7 @@ def predict(image_path, train_loader, model, device):
     
     # Save the predicted image
     
-    class_names = ["paper", "bottle", "alluminum", "nylon"]
+    class_names = ["background", "alluminum", "carton", "bottle", "nylon"]
     
     # Create a legend
     legend_elements = [plt.Rectangle((0, 0), 1, 1, color=colormap(i)) for i in range(len(class_names))]
