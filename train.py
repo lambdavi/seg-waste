@@ -80,12 +80,17 @@ def main():
         net = BiSeNet(cfg.DATA.NUM_CLASSES, None, None, None) # get Bisenetv1
 
     net=net.to(device)
-    _t = {'train time' : Timer(),'val time' : Timer()} 
-    validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
+    
     if cfg.LOAD:
-        net.load_state_dict(torch.load("models/saved_models/best_model.pth"))
-        
+        try:
+            net.load_state_dict(torch.load("models/saved_models/best_model.pth"))
+            print("Model loaded successfully.")
+        except:
+            print("Error in loading the model")
+            exit()
     else:
+        _t = {'train time' : Timer(),'val time' : Timer()} 
+        validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
         optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
         reduction  = MeanReduction()
         scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
