@@ -21,4 +21,6 @@ def get_parser():
 
     parser.add_argument('--save', action='store_true', default=False, help='Model saved at the end (training performed)')
     parser.add_argument('--load', action='store_true', default=False, help='Load saved model')
+    parser.add_argument('--pred_path', type=str, default=None, help='path of the image to predict')
+
     return parser

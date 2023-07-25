@@ -105,6 +105,8 @@ def main():
         torch.save(net.state_dict(), "models/saved_models/best_model.pth")
 
     print(torchsummary(net, (1, 224, 448)))
+    if cfg.PRED_PATH:
+        predict(cfg.PRED_PATH, train_loader, net, device)
     
 def update_metric(metric, outputs, labels):
         """
@@ -192,6 +194,71 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     print('\t',val_metric.get_results())
     net.train()
 
+def predict(image_path, train_loader, model, device):
+    """
+    Handles the the prediction. Outputs an image in the root directory.
+    Args: 
+        `image_path`: path to the image to predict.
+    """
+        
+    # Load and preprocess the input image
+    input_image = Image.open(image_path)
+
+    # Apply necessary transformations
+    transforms = train_loader.dataset.transform
+
+    # Add batch dimension
+    input_tensor = transforms(input_image).unsqueeze(0)  
+    input_tensor = input_tensor.to(device)
+    model.eval()
+    # Perform inference
+    with torch.no_grad():
+        if cfg.model == "enet":
+            output = model(input_tensor)  # Get the output logits
+        else: 
+            output = model(input_tensor, test=True)  # Get the output logits
+
+    output = output.squeeze(0).cpu().numpy()
+
+    normalized_output = (output - output.min()) / (output.max() - output.min())
+
+    predicted_labels = np.argmax(normalized_output, axis=0)
+
+    # Get colormap
+    colormap = plt.cm.get_cmap('tab20', predicted_labels.max() + 1)
+
+    # Create the predicted image with colors
+    predicted_image = Image.fromarray((colormap(predicted_labels) * 255).astype(np.uint8))
+    
+    # Save the predicted image
+    
+    class_names = ["paper", "bottle", "alluminum", "nylon"]
+    
+    # Create a legend
+    legend_elements = [plt.Rectangle((0, 0), 1, 1, color=colormap(i)) for i in range(len(class_names))]
+
+    # Create a figure and axes
+    _, ax = plt.subplots()
+
+    # Display the predicted image
+    ax.imshow(np.array(input_image))
+
+    
+    ax.imshow(predicted_image, alpha=0.4)
+    
+    ax.axis('off')
+
+    # Create the legend outside the image
+    legend = ax.legend(legend_elements, class_names, loc='center left', bbox_to_anchor=(1, 0.5))
+
+    # Adjust the positioning and appearance of the legend
+    legend.set_title('Legend')
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
+    frame.set_facecolor('white')
+
+    # Save the figure
+    plt.savefig('class_img.png', bbox_inches='tight', dpi=300)
 
 if __name__ == '__main__':
     main()

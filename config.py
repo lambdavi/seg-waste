@@ -21,6 +21,7 @@ __C.VIS = edict()
 __C.MODEL = args.model
 __C.TASK = "multi"
 __C.SAVE = args.save
+__C.PRED_PATH = args.pred_path
 
 #------------------------------DATA------------------------
 
