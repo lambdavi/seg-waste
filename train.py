@@ -157,8 +157,8 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
         iou_ += calculate_mean_iu([outputs.squeeze_(1).data.cpu().numpy()], [labels.data.cpu().numpy()], 2)
     mean_iu = iou_/len(val_loader)   
 
-    print('[mean iu %.4f]' % (mean_iu)) 
-    print(val_metric.get_results())
+    print('\t[mean iu %.4f]' % (mean_iu)) 
+    print('\t',val_metric.get_results())
     net.train()
     criterion.to(device)
 
