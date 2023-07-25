@@ -118,7 +118,7 @@ def update_metric(metric, outputs, labels):
         """
         _, prediction = outputs.max(dim=1)
         labels = labels.cpu().numpy()
-        prediction = prediction.cpu().numpy()
+        prediction = prediction.detach().cpu().numpy()
         metric.update(labels, prediction)
 
 def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu"):
