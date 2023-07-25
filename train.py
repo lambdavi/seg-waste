@@ -255,10 +255,10 @@ def predict(image_path, train_loader, model, device):
     _, ax = plt.subplots()
 
     # Display the predicted image
-    ax.imshow(np.array(input_image))
+    #ax.imshow(np.array(input_image))
 
     
-    ax.imshow(predicted_image, alpha=0.4)
+    ax.imshow(predicted_image)
     
     ax.axis('off')
 
