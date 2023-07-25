@@ -146,7 +146,7 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
             if cfg.MODEL == "enet":
                 outputs = net(inputs)
             else:
-                outputs = net(inputs, test=True)[0]
+                outputs = net(inputs, test=True)
             #for binary classification
             outputs[outputs>0.5] = 1
             outputs[outputs<=0.5] = 0
