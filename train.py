@@ -13,6 +13,7 @@ from tensorboardX import SummaryWriter
 
 from models.enet import ENet
 from models.bisenetv2 import BiSeNetV2
+from models.bisenet import BiSeNet
 #from models.icnet import ICNet
 from config import cfg
 from loading_data import loading_data
@@ -57,7 +58,10 @@ def main():
             device = "cpu"
 
     torch.backends.cudnn.benchmark = True
-
+    if cfg.TASK == "binary":
+        criterion = torch.nn.BCEWithLogitsLoss().to(device)# Binary Classification
+    else:
+        criterion = torch.nn.CrossEntropyLoss(ignore_index=255, reduction='none')
     net = []   
     
     if cfg.MODEL == "enet":
@@ -71,22 +75,18 @@ def main():
                 net.encoder.load_state_dict(encoder_weight)
         elif cfg.TRAIN.STAGE =='encoder':
             net = ENet(only_encode=True)
-    else:   
+    elif cfg.MODEL == "bisenetv2":   
         net = BiSeNetV2(cfg.DATA.NUM_CLASSES, pretrained=True)
-
-    net=net.to(device)
-
-    net.train()
-
-    if cfg.TASK == "binary":
-        criterion = torch.nn.BCEWithLogitsLoss().to(device)# Binary Classification
     else:
-        criterion = torch.nn.CrossEntropyLoss(ignore_index=255, reduction='none')
+        net = BiSeNet(cfg.DATA.NUM_CLASSES, is_training=None) # get Bisenetv1
+
+    
 
     optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
     reduction  = MeanReduction()
     scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
-    print(summary(net, (3, 224, 448)))
+    #print(net)
+    net=net.to(device)
 
     _t = {'train time' : Timer(),'val time' : Timer()} 
     validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
@@ -131,7 +131,7 @@ def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu
         labels = Variable(labels).to(device, dtype=torch.long)
         if cfg.MODEL == "enet":
             outputs = net(inputs)
-        else:
+        elif cfg.MODEL == "bisenetv2":
             outputs = net(inputs, test=False)[0]
 
         if cfg.TASK == "binary":
