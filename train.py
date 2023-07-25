@@ -214,8 +214,37 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     print_results(val_metric)
 
     net.train()
-
 def predict(image_path, train_loader, model, device):
+    input_image = Image.open(image_path)
+
+    # Apply necessary transformations
+    transforms = train_loader.dataset.transform
+
+    # Add batch dimension
+    input_tensor = transforms(input_image).unsqueeze(0)  
+    input_tensor = input_tensor.to(device)
+    model.eval()
+    # Perform inference
+    with torch.no_grad():
+        if cfg.MODEL == "enet":
+            output = model(input_tensor)  # Get the output logits
+        elif cfg.MODEL == "bisenetv2":
+            output = model(input_tensor, test=False)[0]
+        else:
+            output = model(input_tensor)
+
+    output = output.squeeze(0).cpu().numpy()
+    translator = {0: 255, 1: 50, 2: 100, 3: 150, 4: 200}
+    predicted_labels = np.argmax(output, axis=0)
+    fin = np.vectorize(translator.get)(predicted_labels)
+    _, ax = plt.subplots()
+    ax.imshow(fin)
+    plt.savefig('class_img.png', bbox_inches='tight', dpi=300)
+
+
+
+
+def predict2(image_path, train_loader, model, device):
     """
     Handles the the prediction. Outputs an image in the root directory.
     Args: 
@@ -248,15 +277,14 @@ def predict(image_path, train_loader, model, device):
     predicted_labels = np.argmax(output, axis=0)
     print(np.unique(predicted_labels))
 
-    class_names = ["alluminum", "carton", "bottle", "nylon", "background"]
+    class_names = ["background", "alluminum", "carton", "bottle", "nylon"]
 
     # Get colormap
     colormap = plt.cm.get_cmap('tab20', len(class_names))
     print(colormap)
 
     # Create the predicted image with colors
-    predicted_image = Image.fromarray((colormap(predicted_labels) *255 ).astype(np.uint8))    
-    
+    predicted_image = Image.fromarray((colormap(predicted_labels) * 255 ).astype(np.uint8))    
     # Create a legend
     legend_elements = [plt.Rectangle((0, 0), 1, 1, color=colormap(i)) for i in range(len(class_names))]
 
