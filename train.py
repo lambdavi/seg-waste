@@ -113,7 +113,7 @@ def main():
         predict(cfg.PRED_PATH, train_loader, net, device)
         
     if cfg.SAVE and not cfg.LOAD:
-        torch.save(net, "models/saved_models/best_model.pth")
+        torch.save(net.state_dict(), "models/saved_models/best_model.pth")
 
     
     
