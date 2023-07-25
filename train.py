@@ -35,10 +35,7 @@ train_metric = StreamSegMetrics(2, "train")
 val_metric = StreamSegMetrics(2, "val")
 
 def main():
-    # TODO Modify args and create a skeleton OOP
-
-    #parser = get_parser()
-    #args = parser.parse_args()
+    # TODO Create a skeleton OOP
 
     cfg_file = open('./config.py',"r")  
     cfg_lines = cfg_file.readlines()
@@ -58,17 +55,19 @@ def main():
 
     net = []   
     
-    """if cfg.TRAIN.STAGE=='all':
-        net = ENet(only_encode=False)
-        if cfg.TRAIN.PRETRAINED_ENCODER != '':
-            encoder_weight = torch.load(cfg.TRAIN.PRETRAINED_ENCODER)
-            del encoder_weight['classifier.bias']
-            del encoder_weight['classifier.weight']
-            # pdb.set_trace()
-            net.encoder.load_state_dict(encoder_weight)
-    elif cfg.TRAIN.STAGE =='encoder':
-        net = ENet(only_encode=True)"""
-    net = BiSeNetV2(cfg.DATA.NUM_CLASSES, pretrained=True)
+    if cfg.MODEL == "enet":
+        if cfg.TRAIN.STAGE=='all':
+            net = ENet(only_encode=False)
+            if cfg.TRAIN.PRETRAINED_ENCODER != '':
+                encoder_weight = torch.load(cfg.TRAIN.PRETRAINED_ENCODER)
+                del encoder_weight['classifier.bias']
+                del encoder_weight['classifier.weight']
+                # pdb.set_trace()
+                net.encoder.load_state_dict(encoder_weight)
+        elif cfg.TRAIN.STAGE =='encoder':
+            net = ENet(only_encode=True)
+    else:   
+        net = BiSeNetV2(cfg.DATA.NUM_CLASSES, pretrained=True)
 
     net=net.to(device)
 
@@ -98,7 +97,12 @@ def train(train_loader, net, criterion, optimizer, epoch, device="cpu"):
         inputs = Variable(inputs).to(device)
         labels = Variable(labels).to(device)
         optimizer.zero_grad()
-        outputs = net(inputs, test=False)[0]
+
+        if cfg.MODEL == "enet":
+            outputs = net(inputs)
+        else:
+            outputs = net(inputs, test=False)[0]
+
         loss = criterion(outputs, labels.unsqueeze(1).float())
         loss.backward()
         optimizer.step()
@@ -139,7 +143,10 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
             inputs, labels = data
             inputs = Variable(inputs).to(device)
             labels = Variable(labels).to(device)
-            outputs = net(inputs, test=True)
+            if cfg.MODEL == "enet":
+                outputs = net(inputs)
+            else:
+                outputs = net(inputs, test=True)[0]
             #for binary classification
             outputs[outputs>0.5] = 1
             outputs[outputs<=0.5] = 0

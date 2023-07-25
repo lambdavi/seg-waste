@@ -1,7 +1,11 @@
 import os
 from easydict import EasyDict as edict
+from utils.args import get_parser
 import time
 import torch
+
+parser = get_parser()
+args = parser.parse_args()
 
 
 # init
@@ -14,6 +18,7 @@ __C.TRAIN = edict()
 __C.VAL = edict()
 __C.TEST = edict()
 __C.VIS = edict()
+__C.MODEL = args.model
 
 #------------------------------DATA------------------------
 
@@ -34,7 +39,7 @@ __C.TRAIN.PRETRAINED_ENCODER = 'ENEt' # Path of the pretrained encoder
 
 # input setting
 
-__C.TRAIN.BATCH_SIZE = 8 #imgs
+__C.TRAIN.BATCH_SIZE = args.bs #imgs
 __C.TRAIN.IMG_SIZE = (224,448)
 
 __C.TRAIN.GPU_ID = [0]
@@ -43,13 +48,13 @@ __C.TRAIN.GPU_ID = [0]
 __C.TRAIN.RESUME = '' #model path
 
 # learning rate settings
-__C.TRAIN.LR = 5e-4
+__C.TRAIN.LR = args.lr
 __C.TRAIN.LR_DECAY = 0.995
 __C.TRAIN.NUM_EPOCH_LR_DECAY = 1 #epoches
 
-__C.TRAIN.WEIGHT_DECAY = 2e-4
+__C.TRAIN.WEIGHT_DECAY = args.wd
 
-__C.TRAIN.MAX_EPOCH = 10
+__C.TRAIN.MAX_EPOCH = args.n_epochs
 
 # output 
 __C.TRAIN.PRINT_FREQ = 10
@@ -70,7 +75,7 @@ __C.TRAIN.EXP_LOG_PATH = './logs'
 __C.TRAIN.EXP_PATH = './exp'
 
 #------------------------------VAL------------------------
-__C.VAL.BATCH_SIZE = 8 # imgs
+__C.VAL.BATCH_SIZE = args.bs # imgs
 __C.VAL.SAMPLE_RATE = 1
 
 #------------------------------TEST------------------------
