@@ -88,7 +88,7 @@ def main():
     scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
 
     _t = {'train time' : Timer(),'val time' : Timer()} 
-    #validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
+    validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
     print("Starting training..")
     for epoch in range(cfg.TRAIN.MAX_EPOCH):
         print(f"Epoch {epoch}/{cfg.TRAIN.MAX_EPOCH}")
@@ -152,7 +152,6 @@ def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu
 
 def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     net.eval()
-    criterion.cpu()
     input_batches = []
     output_batches = []
     label_batches = []
@@ -167,12 +166,15 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
                 outputs = net(inputs)
             else:
                 outputs = net(inputs, test=True)
-            #for binary classification
-            outputs[outputs>0.5] = 1
-            outputs[outputs<=0.5] = 0
-            #print(outputs)
-            #print(labels)
-            val_metric.update(labels.cpu().numpy(), outputs.cpu().numpy())
+
+            if cfg.TASK == "binary":
+                #for binary classification
+                outputs[outputs>0.5] = 1
+                outputs[outputs<=0.5] = 0
+                val_metric.update(labels.cpu().numpy(), outputs.cpu().numpy())
+            else:
+                update_metric(val_metric, outputs, labels)
+
         
         iou_ += calculate_mean_iu([outputs.squeeze_(1).data.cpu().numpy()], [labels.data.cpu().numpy()], 2)
     mean_iu = iou_/len(val_loader)   
@@ -180,7 +182,6 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     print('\t[mean iu %.4f]' % (mean_iu)) 
     print('\t',val_metric.get_results())
     net.train()
-    #criterion
 
 
 if __name__ == '__main__':
