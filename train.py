@@ -90,12 +90,14 @@ def main():
     validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
     print("Starting training..")
     for epoch in range(cfg.TRAIN.MAX_EPOCH):
-        print(f"Epoch {epoch}/{cfg.TRAIN.MAX_EPOCH}")
+        print(f"### \tEpoch {epoch+1}/{cfg.TRAIN.MAX_EPOCH}\t ###")
         _t['train time'].tic()
+        print("\t### TRAINING ###")
         train(train_loader, net, criterion, reduction, optimizer, epoch, device)
         _t['train time'].toc(average=False)
         print('training time of one epoch: {:.2f}s'.format(_t['train time'].diff))
         _t['val time'].tic()
+        print("\t### VALIDATION ###")
         validate(val_loader, net, criterion, optimizer, epoch, restore_transform, device)
         _t['val time'].toc(average=False)
         print('val time of one epoch: {:.2f}s'.format(_t['val time'].diff))
@@ -123,13 +125,18 @@ def update_metric(metric, outputs, labels):
         prediction = prediction.cpu().numpy()
         metric.update(labels, prediction)
 
+def print_results(metric):
+        results = metric.get_results()
+        print(f"\tMean IOU: {results['Mean IoU']}, Class IOU: {results['Class IoU']}, Class Precision: {results['Class Prec']}")
+
+
 def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu"):
     train_metric.reset()
     torch.cuda.empty_cache()
     for inputs, labels in tqdm(train_loader, ascii=True):
-        #inputs, labels = data
         inputs = Variable(inputs).to(device, dtype=torch.float32)
         labels = Variable(labels).to(device, dtype=torch.long)
+
         if cfg.MODEL == "enet":
             outputs = net(inputs)
         elif cfg.MODEL == "bisenetv2":
@@ -156,9 +163,7 @@ def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu
             update_metric(train_metric, outputs, labels)
             #train_metric.update(labels.cpu().numpy(), outputs.detach().cpu().numpy())
     
-    # TODO: Better results visualization
-    print(train_metric.get_results())
-
+        print_results(train.metric)
 
 def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     net.eval()
@@ -196,7 +201,8 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     #mean_iu = iou_/len(val_loader)   
 
     #print('\t[mean iu %.4f]' % (mean_iu)) 
-    print('\t',val_metric.get_results())
+    print_results(train.metric)
+
     net.train()
 
 def predict(image_path, train_loader, model, device):
