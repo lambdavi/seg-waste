@@ -157,7 +157,7 @@ def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu
         else:
             loss = reduction(criterion(outputs,labels),labels)
 
-        print(torch.unique(labels))
+        #print(torch.unique(labels))
         optimizer.zero_grad()   
         loss.backward()
         optimizer.step()
