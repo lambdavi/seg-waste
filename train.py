@@ -22,6 +22,7 @@ from utils.stream_metrics import StreamSegMetrics
 import pdb
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import torchsummary
 
 
 exp_name = cfg.TRAIN.EXP_NAME
@@ -96,7 +97,8 @@ def main():
         validate(val_loader, net, criterion, optimizer, epoch, restore_transform, device)
         _t['val time'].toc(average=False)
         print('val time of one epoch: {:.2f}s'.format(_t['val time'].diff))
-
+    
+    print(torchsummary.summary(net, 1, cfg.IMAGE_SIZE))
 
 def train(train_loader, net, criterion, optimizer, epoch, device="cpu"):
     train_metric.reset()
