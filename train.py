@@ -78,7 +78,7 @@ def main():
     elif cfg.MODEL == "bisenetv2":   
         net = BiSeNetV2(cfg.DATA.NUM_CLASSES, pretrained=True)
     else:
-        net = BiSeNet(cfg.DATA.NUM_CLASSES, is_training=None) # get Bisenetv1
+        net = BiSeNet(cfg.DATA.NUM_CLASSES, None, None) # get Bisenetv1
 
     
 
