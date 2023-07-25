@@ -4,6 +4,7 @@ from PIL import Image
 from torch.utils import data
 import numpy as np
 from config import cfg
+from torch import from_numpy
 
 processed_train_path = os.path.join(cfg.DATA.DATA_PATH, 'train')
 processed_val_path = os.path.join(cfg.DATA.DATA_PATH, 'val')
@@ -41,25 +42,40 @@ class resortit(data.Dataset):
         self.loader = default_loader
         self.simul_transform = simul_transform
         self.transform = transform
+        self.mapping = self.get_mapping()
         self.target_transform = target_transform
 
+
+    @staticmethod
+    def get_mapping():
+        """
+        Generates a mapping function for target labels.
+
+        Returns:
+            The mapping function.
+        """
+        mapping = np.zeros((256,), dtype=np.int64) + 255
+        for gta_idx, data_idx in translator.items():
+            mapping[gta_idx] = data_idx
+        return lambda x: from_numpy(mapping[x])
+    
     def __getitem__(self, index):
         img_path, mask_path = self.imgs[index]
         img = self.loader(img_path)
         mask = np.array(self.loader(mask_path))
         if cfg.TASK == "binary":
             mask[mask>0] = 1   ##########Only Binary Segmentation#####
-        else:
-            np.vectorize(translator.get)(mask)
+
         mask = Image.fromarray(mask)
         if self.simul_transform is not None:
             img, mask = self.simul_transform(img, mask)
         if self.transform is not None:
             img = self.transform(img)
         if self.target_transform is not None:
-            mask = self.target_transform(mask)
+            mask = self.target_transform(self.mapping(mask))
 
         return img, mask
 
     def __len__(self):
         return len(self.imgs)
+    
