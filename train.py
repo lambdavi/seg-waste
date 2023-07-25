@@ -82,12 +82,13 @@ def main():
     net=net.to(device)
     
     if cfg.LOAD:
-        try:
+        """try:
             net.load_state_dict(torch.load("models/saved_models/best_model.pth"))
             print("Model loaded successfully.")
         except:
             print("Error in loading the model")
-            exit()
+            exit()"""
+        net.load_state_dict(torch.load("models/saved_models/best_model.pth"))
     else:
         _t = {'train time' : Timer(),'val time' : Timer()} 
         validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
