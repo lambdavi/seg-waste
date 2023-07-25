@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import torchsummary
 
 
+
 exp_name = cfg.TRAIN.EXP_NAME
 log_txt = cfg.TRAIN.EXP_LOG_PATH + '/' + exp_name + '.txt'
 writer = SummaryWriter(cfg.TRAIN.EXP_PATH+ '/' + exp_name)
@@ -76,21 +77,23 @@ def main():
     net=net.to(device)
 
     net.train()
+
     if cfg.TASK == "binary":
         criterion = torch.nn.BCEWithLogitsLoss().to(device)# Binary Classification
     else:
-        criterion = torch.nn.CrossEntropyLoss(ignore_index=cfg.DATA.IGNORE_LABEL)
+        criterion = torch.nn.CrossEntropyLoss(ignore_index=255, reduction='none')
 
     optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
+    reduction  = MeanReduction()
     scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
 
     _t = {'train time' : Timer(),'val time' : Timer()} 
-    validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
+    #validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
     print("Starting training..")
     for epoch in range(cfg.TRAIN.MAX_EPOCH):
         print(f"Epoch {epoch}/{cfg.TRAIN.MAX_EPOCH}")
         _t['train time'].tic()
-        train(train_loader, net, criterion, optimizer, epoch, device)
+        train(train_loader, net, criterion, reduction, optimizer, epoch, device)
         _t['train time'].toc(average=False)
         print('training time of one epoch: {:.2f}s'.format(_t['train time'].diff))
         _t['val time'].tic()
@@ -99,20 +102,37 @@ def main():
         print('val time of one epoch: {:.2f}s'.format(_t['val time'].diff))
     
     #print(torchsummary.summary(net, 1, cfg.IMAGE_SIZE))
+def update_metric(metric, outputs, labels):
+        """
+        Update the evaluation metric with the model outputs and labels.
 
-def train(train_loader, net, criterion, optimizer, epoch, device="cpu"):
+        Args:
+            `metric`: Metric object to be updated.\n
+            `outputs`: Model outputs.\n
+            `labels`: True labels.
+
+        """
+        _, prediction = outputs.max(dim=1)
+        labels = labels.cpu().numpy()
+        prediction = prediction.cpu().numpy()
+        metric.update(labels, prediction)
+def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu"):
     train_metric.reset()
     for inputs, labels in tqdm(train_loader, ascii=True):
         #inputs, labels = data
-        inputs = Variable(inputs).to(device)
-        labels = Variable(labels).to(device)
+        inputs = Variable(inputs).to(device, dtype=torch.float32)
+        labels = Variable(labels).to(device, dtype=torch.long)
 
         if cfg.MODEL == "enet":
             outputs = net(inputs)
         else:
             outputs = net(inputs, test=False)[0]
 
-        loss = criterion(outputs, labels.unsqueeze(1).float())
+        if cfg.TASK == "binary":
+            loss = criterion(outputs, labels.unsqueeze(1).float())
+        else:
+            loss = reduction(criterion(outputs,labels),labels)
+
 
         optimizer.zero_grad()   
         loss.backward()
@@ -124,7 +144,8 @@ def train(train_loader, net, criterion, optimizer, epoch, device="cpu"):
             out_metr[out_metr<=0.5] = 0    
             train_metric.update(labels.cpu().numpy(), out_metr.cpu().numpy())
         else:
-            train_metric.update(labels.cpu().numpy(), outputs.cpu().numpy())
+            update_metric(train_metric, outputs, labels)
+            #train_metric.update(labels.cpu().numpy(), outputs.detach().cpu().numpy())
 
     print(train_metric.get_results())
 
@@ -159,7 +180,7 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     print('\t[mean iu %.4f]' % (mean_iu)) 
     print('\t',val_metric.get_results())
     net.train()
-    criterion.to(device)
+    #criterion
 
 
 if __name__ == '__main__':
