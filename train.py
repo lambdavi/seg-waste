@@ -116,13 +116,14 @@ def update_metric(metric, outputs, labels):
         labels = labels.cpu().numpy()
         prediction = prediction.cpu().numpy()
         metric.update(labels, prediction)
+
 def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu"):
     train_metric.reset()
     for inputs, labels in tqdm(train_loader, ascii=True):
         #inputs, labels = data
         inputs = Variable(inputs).to(device, dtype=torch.float32)
         labels = Variable(labels).to(device, dtype=torch.long)
-
+        print(torch.unique(labels))
         if cfg.MODEL == "enet":
             outputs = net(inputs)
         else:
