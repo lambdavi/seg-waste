@@ -14,7 +14,6 @@ def default_loader(path):
     return Image.open(path)
 
 class_eval_multi = [255, 0, 1, 2, 3]
-class_eval_bin = [255, 0]
 
 
 def make_dataset(mode):
@@ -51,10 +50,7 @@ class resortit(data.Dataset):
 
     @staticmethod
     def get_mapping():
-        if cfg.TASK == "binary":
-            classes = class_eval_multi
-        else:
-            classes = class_eval_bin
+        classes = class_eval_multi
         mapping = np.zeros((256,), dtype=np.int64) + 255
         for i, cl in enumerate(classes):
             mapping[i] = cl
@@ -72,7 +68,9 @@ class resortit(data.Dataset):
         if self.transform is not None:
             img = self.transform(img)
         if self.target_transform is not None:
-            mask = self.mapping(self.target_transform(mask))
+            if cfg.TASK == "multi":
+                mask = self.mapping(mask)
+            mask = self.target_transform(mask)
 
         return img, mask
 

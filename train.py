@@ -33,8 +33,8 @@ train_loader, val_loader, restore_transform = loading_data()
 
 
 if cfg.TASK == 'binary':
-    train_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "train")
-    val_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "val")
+    train_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES+1, "train")
+    val_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES+1, "val")
 else:
     train_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "train")
     val_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "val")
@@ -81,15 +81,12 @@ def main():
     net=net.to(device)
     
     if cfg.LOAD:
-        """try:
+        try:
             net.load_state_dict(torch.load("models/saved_models/best_model.pth"))
             print("Model loaded successfully.")
         except:
             print("Error in loading the model")
-            exit()"""
-        net.load_state_dict(torch.load("models/saved_models/best_model.pth"))
-        net=net.to(device)
-
+            exit()
     else:
         _t = {'train time' : Timer(),'val time' : Timer()} 
         optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
