@@ -23,9 +23,6 @@ from utils.stream_metrics import StreamSegMetrics
 import pdb
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from torchsummary import summary
-
-
 
 exp_name = cfg.TRAIN.EXP_NAME
 log_txt = cfg.TRAIN.EXP_LOG_PATH + '/' + exp_name + '.txt'
@@ -37,8 +34,8 @@ if cfg.TASK == 'binary':
     train_metric = StreamSegMetrics(2, "train")
     val_metric = StreamSegMetrics(2, "val")
 else:
-    train_metric = StreamSegMetrics(4, "train")
-    val_metric = StreamSegMetrics(4, "val")
+    train_metric = StreamSegMetrics(5, "train")
+    val_metric = StreamSegMetrics(5, "val")
 
 def main():
     # TODO Create a skeleton OOP
@@ -139,7 +136,7 @@ def print_results(metric):
         results = metric.get_results()
         print(f"\tMean IOU: {results['Mean IoU']}")
         print(f"\tClass IOU: {results['Class IoU']}")
-        print(f"\tClass Precision: {results['Class Prec']}")
+        print(f"\Class Accuracy: {results['Class Acc']}")
 
 
 def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu"):
