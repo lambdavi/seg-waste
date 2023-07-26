@@ -72,7 +72,7 @@ class resortit(data.Dataset):
         if self.transform is not None:
             img = self.transform(img)
         if self.target_transform is not None:
-            mask = self.target_transform(self.mapping(mask))
+            mask = self.mapping(self.target_transform(mask))
 
 
         return img, mask

@@ -302,12 +302,11 @@ def predict(image_path, train_loader, model, device):
     mask = gt_tensor.numpy()
     translator = {0: 1, 1: 2, 2: 3, 3: 4}
     new_pred = np.vectorize(translator.get)(predicted_labels)
-
+    
     #print(new_pred.shape)
     #print(mask.shape)
     #print(mask)
     new_pred = new_pred * mask
-    print(new_pred)
     class_names = ["background", "alluminum", "carton", "bottle", "nylon"]
 
     # Get colormap
