@@ -293,9 +293,10 @@ def predict(image_path, train_loader, model, device):
     predicted_labels = np.argmax(output, axis=0)
     print(np.unique(predicted_labels))
 
+    print(np.unique(gt_tensor))
     # Convert labels into masks
-    gt_tensor[gt_tensor!=255] = 1
-    gt_tensor[gt_tensor==255] = 0
+    gt_tensor[gt_tensor != 255] = 1
+    gt_tensor[gt_tensor == 255] = 0
 
     mask = gt_tensor.cpu().numpy()
     translator = {0: 1, 1: 2, 2: 3, 3: 4}
