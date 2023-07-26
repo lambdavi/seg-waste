@@ -303,6 +303,7 @@ def predict(image_path, train_loader, model, device):
 
     print(new_pred.shape)
     print(mask.shape)
+    print(mask)
     new_pred[~mask] = 0
     print(new_pred)
     class_names = ["alluminum", "carton", "bottle", "nylon"]
