@@ -265,13 +265,17 @@ def predict(image_path, train_loader, model, device):
     splits = image_path.split("/")
     gt_path = splits[0]+"/labels/"+splits[1]+"/"+splits[2]
     print(gt_path)
+    input_gt = Image.open(gt_path)
 
     # Apply necessary transformations
     transforms = train_loader.dataset.transform
-
+    target_transforms = train_loader.dataset.target_transform
     # Add batch dimension
     input_tensor = transforms(input_image).unsqueeze(0)  
+    gt_tensor = target_transforms(input_gt).unsqueeze(0)  
+
     input_tensor = input_tensor.to(device)
+    gt_tensor = gt_tensor.to(device)
     model.eval()
     # Perform inference
     with torch.no_grad():
@@ -287,6 +291,15 @@ def predict(image_path, train_loader, model, device):
 
     predicted_labels = np.argmax(output, axis=0)
     print(np.unique(predicted_labels))
+
+    # Convert labels into masks
+    gt_tensor[gt_tensor!=255] = 1
+    gt_tensor[gt_tensor==255] = 0
+
+    mask = gt_tensor
+
+    #translator 
+    predicted_labels    
 
     class_names = ["alluminum", "carton", "bottle", "nylon"]
 
