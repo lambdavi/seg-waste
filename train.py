@@ -300,7 +300,7 @@ def predict(image_path, train_loader, model, device):
     gt_tensor[gt_tensor!=255] = 1
     gt_tensor[gt_tensor==255] = 0
 
-    mask = gt_tensor.numpy()
+    mask = gt_tensor.cpu().numpy()
     translator = {0: 1, 1: 2, 2: 3, 3: 4}
     new_pred = np.vectorize(translator.get)(predicted_labels)
 
