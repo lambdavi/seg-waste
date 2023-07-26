@@ -89,6 +89,8 @@ def main():
             print("Error in loading the model")
             exit()"""
         net.load_state_dict(torch.load("models/saved_models/best_model.pth"))
+        net=net.to(device)
+
     else:
         _t = {'train time' : Timer(),'val time' : Timer()} 
         optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
@@ -273,7 +275,8 @@ def predict(image_path, train_loader, model, device):
             output = model(input_tensor)
 
     output = output.squeeze(0).cpu().numpy()
-
+    print(output.shape)
+    print(output)
     #normalized_output = (output - output.min()) / (output.max() - output.min())
 
     predicted_labels = np.argmax(output, axis=0)
