@@ -312,6 +312,7 @@ def predict(image_path, train_loader, model, device):
 
     # Create the predicted image with colors
     predicted_image = Image.fromarray((colormap(new_pred) * 255 ).astype(np.uint8))    
+
     # Create a legend
     legend_elements = [plt.Rectangle((0, 0), 1, 1, color=colormap(i)) for i in range(len(class_names))]
 
@@ -321,7 +322,7 @@ def predict(image_path, train_loader, model, device):
     # Display the predicted image
     #ax.imshow(np.array(input_image))
 
-    ax.imshow(new_pred)
+    ax.imshow(predicted_image)
     
     ax.axis('off')
 
