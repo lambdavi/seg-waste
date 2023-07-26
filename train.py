@@ -272,7 +272,7 @@ def predict(image_path, train_loader, model, device):
     target_transforms = train_loader.dataset.target_transform
     # Add batch dimension
     input_tensor = transforms(input_image).unsqueeze(0)  
-    gt_tensor = target_transforms(input_gt).unsqueeze(0)  
+    gt_tensor = target_transforms(transforms(input_gt)).unsqueeze(0)  
 
     input_tensor = input_tensor.to(device)
     gt_tensor = gt_tensor.to(device)
@@ -296,12 +296,13 @@ def predict(image_path, train_loader, model, device):
     gt_tensor[gt_tensor!=255] = 1
     gt_tensor[gt_tensor==255] = 0
 
-    mask = gt_tensor
+    mask = gt_tensor.to_numpy()
+    translator = {0: 1, 1: 2, 2: 3, 3: 4}
+    new_pred = np.vectorize(translator.get)(predicted_labels)
 
-    #translator 
-    predicted_labels    
+    new_pred[mask==0] = 0
 
-    class_names = ["alluminum", "carton", "bottle", "nylon"]
+    class_names = ["backgroud", "alluminum", "carton", "bottle", "nylon"]
 
     # Get colormap
     colormap = plt.cm.get_cmap('tab20', len(class_names))
