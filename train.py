@@ -30,6 +30,7 @@ writer = SummaryWriter(cfg.TRAIN.EXP_PATH+ '/' + exp_name)
 
 pil_to_tensor = standard_transforms.ToTensor()
 train_loader, val_loader, restore_transform = loading_data()
+
 """
     if cfg.TASK == 'binary':
     train_metric = StreamSegMetrics(2, "train")
@@ -38,8 +39,9 @@ else:
     train_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES+1, "train")
     val_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES+1, "val")
 """
-train_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES+1, "train")
-val_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES+1, "val")
+
+train_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "train")
+val_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "val")
 
 def main():
     # TODO Create a skeleton OOP
@@ -259,6 +261,11 @@ def predict(image_path, train_loader, model, device):
     # Load and preprocess the input image
     input_image = Image.open(image_path)
 
+    # find gt
+    splits = image_path.split("/")
+    gt_path = splits[0]+"/labels/"+splits[1]+"/"+splits[2]
+    print(gt_path)
+
     # Apply necessary transformations
     transforms = train_loader.dataset.transform
 
@@ -277,8 +284,6 @@ def predict(image_path, train_loader, model, device):
 
     output = output.squeeze(0).cpu().numpy()
     print(output.shape)
-    #print(output)
-    #normalized_output = (output - output.min()) / (output.max() - output.min())
 
     predicted_labels = np.argmax(output, axis=0)
     print(np.unique(predicted_labels))
@@ -299,7 +304,6 @@ def predict(image_path, train_loader, model, device):
     # Display the predicted image
     #ax.imshow(np.array(input_image))
 
-    
     ax.imshow(predicted_image)
     
     ax.axis('off')

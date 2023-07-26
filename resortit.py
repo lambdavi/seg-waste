@@ -13,6 +13,7 @@ processed_val_path = os.path.join(cfg.DATA.DATA_PATH, 'val')
 def default_loader(path):
     return Image.open(path)
 
+class_eval = [255, 0, 1, 2, 3]
 
 def make_dataset(mode):
     images = []
@@ -46,12 +47,13 @@ class resortit(data.Dataset):
         self.target_transform = target_transform
 
 
-    """ @staticmethod
-    def get_mapping():s
+    @staticmethod
+    def get_mapping():
+        classes = class_eval
         mapping = np.zeros((256,), dtype=np.int64) + 255
-        for gta_idx, data_idx in translator.items():
-            mapping[gta_idx] = data_idx
-        return lambda x: from_numpy(mapping[x])"""
+        for i, cl in enumerate(classes):
+            mapping[i] = cl
+        return lambda x: from_numpy(mapping[x])
     
     def __getitem__(self, index):
         img_path, mask_path = self.imgs[index]
@@ -59,8 +61,10 @@ class resortit(data.Dataset):
         mask = np.array(self.loader(mask_path))
         if cfg.TASK == "binary":
             mask[mask>0] = 1   ##########Only Binary Segmentation#####
-        else:
+        """
+            else:
             mask[mask==0] = 255
+        """
         
         mask = Image.fromarray(mask)
         if self.simul_transform is not None:
