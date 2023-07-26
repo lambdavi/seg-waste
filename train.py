@@ -214,9 +214,8 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
     print_results(val_metric)
 
     net.train()
-def predict2(image_path, train_loader, model, device):
-    
 
+def predict2(image_path, train_loader, model, device):
     input_image = Image.open(image_path)
 
     # Apply necessary transformations
@@ -236,7 +235,8 @@ def predict2(image_path, train_loader, model, device):
             output = model(input_tensor)
 
     output = output.squeeze(0).cpu().numpy()
-    #translator = {0: cmap(0)*255, 1: cmap(1), 2: cmap(2), 3: 150, 4: 200}
+    print(output.shape)
+    translator = {0: 255, 1: 50, 2: 100, 3: 150, 4: 200}
     predicted_labels = np.argmax(output, axis=0)
     fin = np.vectorize(translator.get)(predicted_labels)
     _, ax = plt.subplots()
@@ -288,7 +288,7 @@ def predict(image_path, train_loader, model, device):
     # Create the predicted image with colors
     predicted_image = Image.fromarray((colormap(predicted_labels) * 255 ).astype(np.uint8))    
     # Create a legend
-    legend_elements = [plt.Rectangle((0, 0), 1, 1, color=colormap(i)*255) for i in range(len(class_names))]
+    legend_elements = [plt.Rectangle((0, 0), 1, 1, color=colormap(i)) for i in range(len(class_names))]
 
     # Create a figure and axes
     _, ax = plt.subplots()
