@@ -92,7 +92,7 @@ def main():
         optimizer = optim.Adam(net.parameters(), lr=cfg.TRAIN.LR, weight_decay=cfg.TRAIN.WEIGHT_DECAY)
         reduction  = MeanReduction()
         scheduler = StepLR(optimizer, step_size=cfg.TRAIN.NUM_EPOCH_LR_DECAY, gamma=cfg.TRAIN.LR_DECAY)
-        validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
+        #validate(val_loader, net, criterion, optimizer, -1, restore_transform, device)
     
         print("Starting training..")
         for epoch in range(cfg.TRAIN.MAX_EPOCH):
@@ -169,8 +169,8 @@ def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu
             #out_metr = outputs.detach()
             outputs[outputs > 0.5] = 1
             outputs[outputs<=0.5] = 0    
-            #train_metric.update(labels.cpu().numpy(), out_metr.cpu().numpy())
-            update_metric(train_metric, outputs, labels)
+            train_metric.update(labels.cpu().numpy(), outputs.cpu().numpy())
+            #update_metric(train_metric, outputs, labels)
         else:
             update_metric(train_metric, outputs, labels)
             #train_metric.update(labels.cpu().numpy(), outputs.detach().cpu().numpy())
@@ -200,8 +200,8 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
                 #for binary classification
                 outputs[outputs>0.5] = 1
                 outputs[outputs<=0.5] = 0
-                #val_metric.update(labels.cpu().numpy(), outputs.cpu().numpy())
-                update_metric(train_metric, outputs, labels)
+                val_metric.update(labels.cpu().numpy(), outputs.cpu().numpy())
+                #update_metric(train_metric, outputs, labels)
 
             else:
                 update_metric(val_metric, outputs, labels)
