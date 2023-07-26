@@ -126,7 +126,10 @@ def update_metric(metric, outputs, labels):
             `labels`: True labels.
 
         """
-        _, prediction = outputs.max(dim=1)
+        if cfg.TASK == "multi":
+            _, prediction = outputs.max(dim=1)
+        else:
+            prediction = outputs
         labels = labels.detach().cpu().numpy()
         prediction = prediction.cpu().numpy()
         metric.update(labels, prediction)
