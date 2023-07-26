@@ -274,9 +274,6 @@ def predict(image_path, train_loader, model, device):
     # Add batch dimension
     input_tensor = transforms(input_image).unsqueeze(0)  
     gt_tensor = target_transforms(mapp(input_gt)).unsqueeze(0)  
-
-    print(input_tensor.shape)
-    print(gt_tensor.shape)
     
     input_tensor = input_tensor.to(device)
     gt_tensor = gt_tensor.to(device)
@@ -304,6 +301,8 @@ def predict(image_path, train_loader, model, device):
     translator = {0: 1, 1: 2, 2: 3, 3: 4}
     new_pred = np.vectorize(translator.get)(predicted_labels)
 
+    print(new_pred.shape)
+    print(mask.shape)
     new_pred[mask==0] = 0
 
     class_names = ["backgroud", "alluminum", "carton", "bottle", "nylon"]
