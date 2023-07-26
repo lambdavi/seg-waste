@@ -140,7 +140,7 @@ def print_results(metric):
         results = metric.get_results()
         print(f"\tMean IOU: {results['Mean IoU']}")
         print(f"\tClass IOU: {results['Class IoU']}")
-        print(f"\Class Accuracy: {results['Class Acc']}")
+        print(f"\tClass Accuracy: {results['Class Acc']}")
 
 
 def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu"):
