@@ -276,7 +276,7 @@ def predict(image_path, train_loader, model, device):
     gt_tensor = target_transforms(mapp(input_gt))
     
     input_tensor = input_tensor.to(device)
-    gt_tensor = gt_tensor.to(device)
+    #gt_tensor = gt_tensor.to(device)
     model.eval()
     # Perform inference
     with torch.no_grad():
@@ -293,12 +293,13 @@ def predict(image_path, train_loader, model, device):
     predicted_labels = np.argmax(output, axis=0)
     print(np.unique(predicted_labels))
 
-    print(np.unique(gt_tensor))
+    print(np.unique(gt_tensor.numpy()))
+
     # Convert labels into masks
     gt_tensor[gt_tensor != 255] = 1
     gt_tensor[gt_tensor == 255] = 0
 
-    mask = gt_tensor.cpu().numpy()
+    mask = gt_tensor.numpy()
     translator = {0: 1, 1: 2, 2: 3, 3: 4}
     new_pred = np.vectorize(translator.get)(predicted_labels)
 
