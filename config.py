@@ -19,7 +19,7 @@ __C.VAL = edict()
 __C.TEST = edict()
 __C.VIS = edict()
 __C.MODEL = args.model
-__C.TASK = "multi"
+__C.TASK = args.task
 __C.SAVE = args.save
 __C.LOAD = args.load
 __C.PRED_PATH = args.pred_path
@@ -28,7 +28,7 @@ __C.PRED_PATH = args.pred_path
 
 __C.DATA.DATASET = 'city' # dataset
 __C.DATA.DATA_PATH = 'dataset/'
-__C.DATA.NUM_CLASSES = 4
+__C.DATA.NUM_CLASSES = 4 if args.task == "multi" else 1
 __C.DATA.IGNORE_LABEL = 255
 __C.DATA.IGNORE_LABEL_TO_TRAIN_ID = 19 # 255->19
 __C.DATA.NUM_WORKERS = 2                                    
