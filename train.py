@@ -260,7 +260,7 @@ def predict(image_path, train_loader, model, device):
     input_image = Image.open(image_path)
 
     # Apply necessary transformations
-    transforms = val_loader.dataset.transform
+    transforms = train_loader.dataset.transform
 
     # Add batch dimension
     input_tensor = transforms(input_image).unsqueeze(0)  
@@ -271,14 +271,13 @@ def predict(image_path, train_loader, model, device):
         if cfg.MODEL == "enet":
             output = model(input_tensor)  # Get the output logits
         elif cfg.MODEL == "bisenetv2":
-            output = model(input_tensor, test=False)[0]
+            output = model(input_tensor, test=True)[0]
         else:
             output = model(input_tensor)
 
     output = output.squeeze(0).cpu().numpy()
     print(output.shape)
     #print(output)
-    print(np.unique(output))
     #normalized_output = (output - output.min()) / (output.max() - output.min())
 
     predicted_labels = np.argmax(output, axis=0)
@@ -288,7 +287,6 @@ def predict(image_path, train_loader, model, device):
 
     # Get colormap
     colormap = plt.cm.get_cmap('tab20', len(class_names))
-    print(colormap)
 
     # Create the predicted image with colors
     predicted_image = Image.fromarray((colormap(predicted_labels) * 255 ).astype(np.uint8))    
