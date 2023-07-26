@@ -270,9 +270,10 @@ def predict(image_path, train_loader, model, device):
     # Apply necessary transformations
     transforms = train_loader.dataset.transform
     target_transforms = train_loader.dataset.target_transform
+    mapp = train_loader.dataset.mapping
     # Add batch dimension
     input_tensor = transforms(input_image).unsqueeze(0)  
-    gt_tensor = target_transforms(input_gt).unsqueeze(0)  
+    gt_tensor = target_transforms(mapp(input_gt)).unsqueeze(0)  
 
     print(input_tensor.shape)
     print(gt_tensor.shape)
