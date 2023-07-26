@@ -260,7 +260,7 @@ def predict(image_path, train_loader, model, device):
     input_image = Image.open(image_path)
 
     # Apply necessary transformations
-    transforms = train_loader.dataset.transform
+    transforms = val_loader.dataset.transform
 
     # Add batch dimension
     input_tensor = transforms(input_image).unsqueeze(0)  
