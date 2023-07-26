@@ -308,7 +308,7 @@ def predict(image_path, train_loader, model, device):
     #print(mask)
     new_pred = new_pred * mask
     print(new_pred)
-    class_names = ["alluminum", "carton", "bottle", "nylon"]
+    class_names = ["background", "alluminum", "carton", "bottle", "nylon"]
 
     # Get colormap
     colormap = plt.cm.get_cmap('tab20', len(class_names))
