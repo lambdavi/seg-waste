@@ -293,20 +293,20 @@ def predict(image_path, train_loader, model, device):
     predicted_labels = np.argmax(output, axis=0)
     print(np.unique(predicted_labels))
 
-    print(np.unique(gt_tensor.numpy()))
+    u = np.unique(gt_tensor.numpy())
 
     # Convert labels into masks
-    gt_tensor[gt_tensor != 255] = 1
-    gt_tensor[gt_tensor == 255] = 0
+    gt_tensor[gt_tensor in u] = 1
+    #gt_tensor[gt_tensor == 255] = 0
 
     mask = gt_tensor.numpy()
     translator = {0: 1, 1: 2, 2: 3, 3: 4}
     new_pred = np.vectorize(translator.get)(predicted_labels)
 
-    print(new_pred.shape)
-    print(mask.shape)
-    print(mask)
-    new_pred[~mask] = 0
+    #print(new_pred.shape)
+    #print(mask.shape)
+    #print(mask)
+    new_pred = new_pred * mask
     print(new_pred)
     class_names = ["alluminum", "carton", "bottle", "nylon"]
 
