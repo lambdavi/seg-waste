@@ -297,6 +297,7 @@ def predict(image_path, train_loader, model, device):
 
     # Convert labels into masks
     gt_tensor[gt_tensor in u] = 1
+    print(gt_tensor)
     #gt_tensor[gt_tensor == 255] = 0
 
     mask = gt_tensor.numpy()
