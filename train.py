@@ -163,10 +163,11 @@ def train(train_loader, net, criterion, reduction, optimizer, epoch, device="cpu
         optimizer.step()
 
         if cfg.TASK == "binary":
-            out_metr = outputs.detach()
-            out_metr[out_metr > 0.5] = 1
-            out_metr[out_metr<=0.5] = 0    
-            train_metric.update(labels.cpu().numpy(), out_metr.cpu().numpy())
+            #out_metr = outputs.detach()
+            outputs[outputs > 0.5] = 1
+            outputs[outputs<=0.5] = 0    
+            #train_metric.update(labels.cpu().numpy(), out_metr.cpu().numpy())
+            update_metric(train_metric, outputs, labels)
         else:
             update_metric(train_metric, outputs, labels)
             #train_metric.update(labels.cpu().numpy(), outputs.detach().cpu().numpy())
@@ -196,7 +197,9 @@ def validate(val_loader, net, criterion, optimizer, epoch, restore, device):
                 #for binary classification
                 outputs[outputs>0.5] = 1
                 outputs[outputs<=0.5] = 0
-                val_metric.update(labels.cpu().numpy(), outputs.cpu().numpy())
+                #val_metric.update(labels.cpu().numpy(), outputs.cpu().numpy())
+                update_metric(train_metric, outputs, labels)
+
             else:
                 update_metric(val_metric, outputs, labels)
 
