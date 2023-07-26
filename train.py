@@ -273,7 +273,7 @@ def predict(image_path, train_loader, model, device):
     mapp = train_loader.dataset.mapping
     # Add batch dimension
     input_tensor = transforms(input_image).unsqueeze(0)  
-    gt_tensor = target_transforms(mapp(input_gt))
+    gt_tensor = target_transforms(input_gt)
     
     input_tensor = input_tensor.to(device)
     #gt_tensor = gt_tensor.to(device)
@@ -293,11 +293,10 @@ def predict(image_path, train_loader, model, device):
     predicted_labels = np.argmax(output, axis=0)
     print(np.unique(predicted_labels))
 
-    u = np.unique(gt_tensor.numpy())
-
     # Convert labels into masks
-    gt_tensor[gt_tensor in u] = 1
+    gt_tensor[gt_tensor != 0] = 1
     print(gt_tensor)
+
     #gt_tensor[gt_tensor == 255] = 0
 
     mask = gt_tensor.numpy()
