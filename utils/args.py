@@ -16,6 +16,7 @@ def get_parser():
     parser.add_argument('--bs', type=int, default=8, help='batch size')
     parser.add_argument('--wd', type=float, default=2e-4, help='weight decay')
     parser.add_argument('--m', type=float, default=0.9, help='momentum')
+    parser.add_argument('--task', type=str, choices=['binary', 'multi'], default="multi", help='binary/multi')
 
     # New Argument:s
 

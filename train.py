@@ -31,17 +31,13 @@ writer = SummaryWriter(cfg.TRAIN.EXP_PATH+ '/' + exp_name)
 pil_to_tensor = standard_transforms.ToTensor()
 train_loader, val_loader, restore_transform = loading_data()
 
-"""
-    if cfg.TASK == 'binary':
-    train_metric = StreamSegMetrics(2, "train")
-    val_metric = StreamSegMetrics(2, "val")
-else:
-    train_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES+1, "train")
-    val_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES+1, "val")
-"""
 
-train_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "train")
-val_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "val")
+if cfg.TASK == 'binary':
+    train_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "train")
+    val_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "val")
+else:
+    train_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "train")
+    val_metric = StreamSegMetrics(cfg.DATA.NUM_CLASSES, "val")
 
 def main():
     # TODO Create a skeleton OOP

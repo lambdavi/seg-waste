@@ -13,7 +13,9 @@ processed_val_path = os.path.join(cfg.DATA.DATA_PATH, 'val')
 def default_loader(path):
     return Image.open(path)
 
-class_eval = [255, 0, 1, 2, 3]
+class_eval_multi = [255, 0, 1, 2, 3]
+class_eval_bin = [255, 0]
+
 
 def make_dataset(mode):
     images = []
@@ -49,7 +51,10 @@ class resortit(data.Dataset):
 
     @staticmethod
     def get_mapping():
-        classes = class_eval
+        if cfg.TASK == "binary":
+            classes = class_eval_multi
+        else:
+            classes = class_eval_bin
         mapping = np.zeros((256,), dtype=np.int64) + 255
         for i, cl in enumerate(classes):
             mapping[i] = cl
@@ -61,11 +66,6 @@ class resortit(data.Dataset):
         mask = np.array(self.loader(mask_path))
         if cfg.TASK == "binary":
             mask[mask>0] = 1   ##########Only Binary Segmentation#####
-        """
-            else:
-            mask[mask==0] = 255
-        """
-        
         mask = Image.fromarray(mask)
         if self.simul_transform is not None:
             img, mask = self.simul_transform(img, mask)
@@ -73,7 +73,6 @@ class resortit(data.Dataset):
             img = self.transform(img)
         if self.target_transform is not None:
             mask = self.mapping(self.target_transform(mask))
-
 
         return img, mask
 
