@@ -1,2 +1,2 @@
 # seg-waste
-Semantic Segmentation for Waste
+Semantic Segmentation for Waste Sorting
