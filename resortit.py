@@ -4,6 +4,7 @@ from PIL import Image
 from torch.utils import data
 import numpy as np
 from config import cfg
+from torch import from_numpy
 
 processed_train_path = os.path.join(cfg.DATA.DATA_PATH, 'train')
 processed_val_path = os.path.join(cfg.DATA.DATA_PATH, 'val')
@@ -11,6 +12,8 @@ processed_val_path = os.path.join(cfg.DATA.DATA_PATH, 'val')
 
 def default_loader(path):
     return Image.open(path)
+
+class_eval_multi = [255, 0, 1, 2, 3]
 
 
 def make_dataset(mode):
@@ -31,6 +34,7 @@ def make_dataset(mode):
             images.append(item)
     return images
 
+#translator = {0: 255, 1:0, 2:1, 3:2, 4:3}
 
 class resortit(data.Dataset):
     def __init__(self, mode, simul_transform=None, transform=None, target_transform=None):
@@ -40,22 +44,36 @@ class resortit(data.Dataset):
         self.loader = default_loader
         self.simul_transform = simul_transform
         self.transform = transform
+        self.mapping = self.get_mapping()
         self.target_transform = target_transform
 
+
+    @staticmethod
+    def get_mapping():
+        classes = class_eval_multi
+        mapping = np.zeros((256,), dtype=np.int64) + 255
+        for i, cl in enumerate(classes):
+            mapping[i] = cl
+        return lambda x: from_numpy(mapping[x])
+    
     def __getitem__(self, index):
         img_path, mask_path = self.imgs[index]
         img = self.loader(img_path)
         mask = np.array(self.loader(mask_path))
-        mask[mask>0] = 1   ##########Only Binary Segmentation#####
+        if cfg.TASK == "binary":
+            mask[mask>0] = 1   ##########Only Binary Segmentation#####
         mask = Image.fromarray(mask)
         if self.simul_transform is not None:
             img, mask = self.simul_transform(img, mask)
         if self.transform is not None:
             img = self.transform(img)
         if self.target_transform is not None:
+            if cfg.TASK == "multi":
+                mask = self.mapping(mask)
             mask = self.target_transform(mask)
 
         return img, mask
 
     def __len__(self):
         return len(self.imgs)
+    

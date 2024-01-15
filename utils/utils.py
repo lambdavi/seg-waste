@@ -91,3 +91,8 @@ def scores(label_trues, label_preds, n_class):
             'Mean Acc : \t': acc_cls,
             'FreqW Acc : \t': fwavacc,
             'Mean IoU : \t': mean_iu,}, cls_iu
+
+class MeanReduction:
+    def __call__(self, x, target):
+        x = x[target != 255]
+        return x.mean()

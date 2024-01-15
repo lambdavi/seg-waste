@@ -21,7 +21,7 @@ def loading_data():
     ])
     target_transform = standard_transforms.Compose([
         own_transforms.MaskToTensor(),
-        own_transforms.ChangeLabel(cfg.DATA.IGNORE_LABEL, cfg.DATA.NUM_CLASSES - 1)
+        own_transforms.ChangeLabel(cfg.DATA.IGNORE_LABEL, cfg.DATA.NUM_CLASSES)
     ])
     restore_transform = standard_transforms.Compose([
         own_transforms.DeNormalize(*mean_std),

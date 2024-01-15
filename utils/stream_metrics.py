@@ -183,12 +183,12 @@ class StreamSegMetrics(Metrics):
         precision_cls_c = diag / (hist.sum(axis=0) + eps)
         precision_cls = np.mean(precision_cls_c)
         iu = diag / (gt_sum + hist.sum(axis=0) - diag + eps)
-        mean_iu = np.mean(iu[mask])
+        mean_iu = round(np.mean(iu[mask]),2)
         freq = hist.sum(axis=1) / hist.sum()
         fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
 
-        cls_iu = dict(zip(range(self.n_classes), [iu[i] if m else "X" for i, m in enumerate(mask)]))
-        cls_acc = dict(zip(range(self.n_classes), [acc_cls_c[i] if m else "X" for i, m in enumerate(mask)]))
+        cls_iu = dict(zip(range(self.n_classes), [round(iu[i],3) if m else "X" for i, m in enumerate(mask)]))
+        cls_acc = dict(zip(range(self.n_classes), [round(acc_cls_c[i],2) if m else "X" for i, m in enumerate(mask)]))
         cls_prec = dict(zip(range(self.n_classes), [precision_cls_c[i] if m else "X" for i, m in enumerate(mask)]))
 
         self.results = {
